@@ -303,7 +303,6 @@ class MultiImageReader:
                 try:
                     self.shms[shm_name] = shared_memory.SharedMemory(name=shm_name)
                 except FileNotFoundError:
-                    print(f"[MultiImageReader] Shared memory {shm_name} not found")
                     return None
 
             shm = self.shms[shm_name]
@@ -426,4 +425,4 @@ class SharedMemoryReader:
         return images.get('head') if images else None
     
     def close(self):
-        self.multi_reader.close() 
+        self.multi_reader.close()

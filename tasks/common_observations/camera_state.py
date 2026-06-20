@@ -37,6 +37,8 @@ _camera_cache = {
     'last_scene_id': None,
     'frame_step': 0,
     'write_interval_steps': 2,
+    'warned_no_standard': False,
+    'warned_no_images': False,
 }
 
 
@@ -89,6 +91,8 @@ def get_camera_image(
         _camera_cache['camera_keys'] = list(env.scene.keys())
         _camera_cache['available_cameras'] = [name for name in _camera_cache['camera_keys'] if "camera" in name.lower()]
         _camera_cache['last_scene_id'] = scene_id
+        _camera_cache['warned_no_standard'] = False
+        _camera_cache['warned_no_images'] = False
 
 
     if _camera_cache['frame_step'] == 0:
@@ -139,7 +143,9 @@ def get_camera_image(
 
         available_cameras = _camera_cache['available_cameras']
         if available_cameras:
-            print(f"[camera_state] No standard cameras found. Available cameras: {available_cameras}")
+            if not _camera_cache['warned_no_standard']:
+                print(f"[camera_state] No standard cameras found. Available cameras: {available_cameras}")
+                _camera_cache['warned_no_standard'] = True
             
             # if there are available cameras, use the first three as head, left, right
             for i, camera_name in enumerate(available_cameras[:3]):
@@ -169,7 +175,8 @@ def get_camera_image(
         except Exception:
             pass
     elif not images:
-        print("[camera_state] No camera images found in the environment")
+        if not _camera_cache['warned_no_images']:
+            print("[camera_state] No camera images found in the environment")
+            _camera_cache['warned_no_images'] = True
     
     return _return_placeholder
-

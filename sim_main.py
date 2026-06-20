@@ -52,6 +52,7 @@ parser.add_argument("--profile_interval", type=int, default=500, help="performan
 
 parser.add_argument("--model_path", type=str, default="assets/model/policy.onnx", help="model path")
 parser.add_argument("--reward_interval", type=int, default=10, help="step interval for reward calculation")
+parser.add_argument("--sim_state_interval", type=int, default=5, help="main-loop interval for publishing sim state")
 parser.add_argument("--enable_wholebody_dds", action="store_true", default=False, help="enable wh dds")
 
 parser.add_argument("--physics_dt", type=float, default=None, help="physics time step, e.g., 0.005")
@@ -455,6 +456,7 @@ def main():
         
         
         reward_interval = max(1, args_cli.reward_interval)
+        sim_state_interval = max(1, args_cli.sim_state_interval)
 
         # use torch.inference_mode() and exception suppression
         with contextlib.suppress(KeyboardInterrupt), torch.inference_mode():
@@ -462,19 +464,19 @@ def main():
                 current_time = time.time()
                 loop_count += 1
                 if not args_cli.replay_data:
-                    try:
-                        env_state = env.scene.get_state()
-                        env_state_json =  sim_state_to_json(env_state)
-                        sim_state = {"init_state":env_state_json,"task_name":args_cli.task}
-                    except Exception as e:
-                        print(f"Failed to get env state: {e}")
-                        raise e
-                    try:
-                    # sim_state = json.dumps(sim_state)
-                        sim_state_dds.write_sim_state_data(sim_state)
-                    except Exception as e:
-                        print(f"Failed to write sim state: {e}")
-                        raise e
+                    if (loop_count % sim_state_interval) == 0:
+                        try:
+                            env_state = env.scene.get_state()
+                            env_state_json =  sim_state_to_json(env_state)
+                            sim_state = {"init_state":env_state_json,"task_name":args_cli.task}
+                        except Exception as e:
+                            print(f"Failed to get env state: {e}")
+                            raise e
+                        try:
+                            sim_state_dds.write_sim_state_data(sim_state)
+                        except Exception as e:
+                            print(f"Failed to write sim state: {e}")
+                            raise e
                     try:
                         reset_pose_cmd = reset_pose_dds.get_reset_pose_command()
                     except Exception as e:
