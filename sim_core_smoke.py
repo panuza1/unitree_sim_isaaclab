@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Minimal Isaac Sim runner: no DDS, no teleimager, no XR."""
+"""Minimal Isaac Sim runner: no DDS, optional Quest image server."""
 
 import argparse
 import os
@@ -19,6 +19,7 @@ parser.add_argument("--steps", type=int, default=0, help="0 means run until the 
 parser.add_argument("--seed", type=int, default=42)
 parser.add_argument("--stats_interval", type=float, default=5.0)
 parser.add_argument("--render_interval", type=int, default=None)
+parser.add_argument("--quest", action="store_true", help="start teleimager image server for Quest/Vuer")
 AppLauncher.add_app_launcher_args(parser)
 args = parser.parse_args()
 
@@ -39,6 +40,7 @@ def zero_action(env):
 
 def main():
     env = None
+    image_server = None
     try:
         env_cfg = parse_env_cfg(args.task, device=args.device, num_envs=1)
         env_cfg.env_name = args.task
@@ -51,11 +53,16 @@ def main():
 
         env.sim.reset()
         env.reset()
+        if args.quest:
+            from teleimager.image_server import run_isaacsim_server
+
+            image_server = run_isaacsim_server()
+            print("[smoke] Quest image server started", flush=True)
 
         action = zero_action(env)
         start = last = time.time()
         step = 0
-        print("[smoke] started: no DDS, no teleimager, no XR", flush=True)
+        print("[smoke] started: no DDS", flush=True)
 
         with torch.inference_mode():
             while simulation_app.is_running() and (args.steps <= 0 or step < args.steps):
@@ -67,6 +74,8 @@ def main():
                     last = now
 
     finally:
+        if image_server is not None:
+            image_server.stop()
         if env is not None:
             env.close()
         simulation_app.close()
