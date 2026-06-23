@@ -180,7 +180,9 @@ class DDSManager:
         self._pub_list.clear()
         for name, obj in self.objects.items():
             if enable_publish_names is None or name in enable_publish_names:
+                print(f"[DDSManager] setup publisher start: {name}", flush=True)
                 obj.setup_publisher()
+                print(f"[DDSManager] setup publisher done: {name}", flush=True)
                 obj.publishing = True
                 self._pub_list.append(name)
         self.publishing_running = True
@@ -203,7 +205,9 @@ class DDSManager:
         """Start subscribing"""
         for name, obj in self.objects.items():  
             if enable_subscribe_names is None or name in enable_subscribe_names:
+                print(f"[DDSManager] setup subscriber start: {name}", flush=True)
                 obj.setup_subscriber()
+                print(f"[DDSManager] setup subscriber done: {name}", flush=True)
                 obj.subscribing = True
 
 
