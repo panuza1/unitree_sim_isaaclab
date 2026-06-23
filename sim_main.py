@@ -31,6 +31,18 @@ parser.add_argument("--action_source", type=str, default="dds",
 
 
 parser.add_argument("--robot_type", type=str, default="g129", help="robot type")
+parser.add_argument(
+    "--no_g1_state_pub",
+    action="store_true",
+    default=False,
+    help="skip G1/H1 lowstate DDS publisher while keeping lowcmd subscriber",
+)
+parser.add_argument(
+    "--sim_dds_command_only",
+    action="store_true",
+    default=False,
+    help="stable Quest/Sim mode: subscribe to control commands but skip DDS state publishers",
+)
 parser.add_argument("--enable_dex1_dds", action="store_true", help="enable gripper DDS")
 parser.add_argument("--enable_dex3_dds", action="store_true", help="enable dexterous hand DDS")
 parser.add_argument("--enable_inspire_dds", action="store_true", help="enable inspire hand DDS")
