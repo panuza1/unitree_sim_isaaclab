@@ -318,7 +318,7 @@ def main():
     print("🔍 Getting robot stiffness and damping parameters from runtime environment")
     print("="*60)
     
-    try:
+    try:    
         stiffness_data = get_robot_stiffness_from_env(env)
         if stiffness_data:
             print("✅ Successfully got robot parameters!")

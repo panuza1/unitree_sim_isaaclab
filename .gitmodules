@@ -1,4 +1,4 @@
 [submodule "teleimager"]
 	path = teleimager
-	url = git@github.com:panuza1/teleimager.git
+	url = https://github.com/panuza1/teleimager.git
 	branch = main
