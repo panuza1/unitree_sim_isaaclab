@@ -24,7 +24,7 @@ from teleimager.image_server import run_isaacsim_server
 from dds.dds_create import create_dds_objects,create_dds_objects_replay
 # add command line arguments
 parser = argparse.ArgumentParser(description="Unitree Simulation")
-parser.add_argument("--task", type=str, default="Isaac-PickPlace-G129-Head-Waist-Fix", help="task name")
+parser.add_argument("--task", type=str, default="Isaac-PickPlace-Cylinder-G129-Inspire-Joint", help="task name")
 parser.add_argument("--action_source", type=str, default="dds", 
                    choices=["dds", "file", "trajectory", "policy", "replay","dds_wholebody"], 
                    help="Action source")
@@ -464,7 +464,7 @@ def main():
         loop_start_time = time.time()
         loop_count = 0
         last_loop_time = time.time()
-        recent_loop_times = []  # for calculating moving average frequency
+        recent_loop_times = []  # for calculating moving average frequencyฟกฟก
         
         
         reward_interval = max(1, args_cli.reward_interval)
