@@ -7,6 +7,7 @@ gripper state
 from __future__ import annotations
 
 import torch
+from tools.inspire_mapping import resolve_inspire_joint_indices
 from typing import TYPE_CHECKING
 import sys
 import os
@@ -104,11 +105,17 @@ def get_robot_inspire_joint_states(
     
 
     global _obs_cache
-    if _obs_cache["device"] != device or _obs_cache["inspire_idx_t"] is None:
-        inspire_joint_indices = [36, 37, 35, 34, 48, 38, 31, 32, 30, 29, 43, 33]
+    runtime_joint_names = tuple(env.scene["robot"].data.joint_names)
+    if (
+        _obs_cache["device"] != device
+        or _obs_cache["inspire_idx_t"] is None
+        or _obs_cache.get("joint_names") != runtime_joint_names
+    ):
+        inspire_joint_indices = resolve_inspire_joint_indices(runtime_joint_names)
         _obs_cache["inspire_idx_t"] = torch.tensor(inspire_joint_indices, dtype=torch.long, device=device)
         _obs_cache["device"] = device
         _obs_cache["batch"] = None
+        _obs_cache["joint_names"] = runtime_joint_names
     idx_t = _obs_cache["inspire_idx_t"]
     n = idx_t.numel()
 
@@ -153,5 +160,4 @@ def get_robot_inspire_joint_states(
             print(f"[gripper_state] Failed to write to shared memory: {e}")
     
     return pos_buf
-
 

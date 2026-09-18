@@ -51,7 +51,6 @@ def main():
         if args.render_interval is not None:
             env.sim.render_interval = max(1, int(args.render_interval))
 
-        env.sim.reset()
         env.reset()
         if args.quest:
             from teleimager.image_server import run_isaacsim_server
