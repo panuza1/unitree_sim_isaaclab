@@ -7,7 +7,16 @@ expected twelve joint names.
 """
 
 import argparse
+import os
 import sys
+from pathlib import Path
+
+# Running ``python tools/<script>.py`` puts tools/, not the repository root,
+# on sys.path.  Task registration lives at the root package level.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+os.environ.setdefault("PROJECT_ROOT", str(PROJECT_ROOT))
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 
 def _print_mapping(runtime_joint_names):
@@ -32,9 +41,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--task", default="Isaac-PickPlace-Cylinder-G129-Inspire-Joint")
     parser.add_argument("--num_envs", type=int, default=1)
-    parser.add_argument("--device", default="cuda")
     from isaaclab.app import AppLauncher
 
+    # Isaac Lab 0.54+ owns --device.  Adding it here raises before Kit starts.
     AppLauncher.add_app_launcher_args(parser)
     args = parser.parse_args()
     app = AppLauncher(args).app
